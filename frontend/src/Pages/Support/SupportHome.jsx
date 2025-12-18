@@ -1,23 +1,34 @@
 import { Link, Outlet } from "react-router-dom";
 
-export default function SupportLayout() {
+export default function SupportHome() {
   return (
-    <div className="flex min-h-screen bg-[#EBF4F6]">
+    <div>
+      <h1 className="text-2xl font-bold text-[#071952] mb-4">
+        Support Dashboard
+      </h1>
 
-      <aside className="w-64 bg-[#37B7C3] text-white p-5">
-        <h2 className="text-xl font-bold mb-6">Support</h2>
+      <p className="text-gray-700 mb-6">
+        Welcome to the Support panel. Here you can view escalated complaints
+        and track resolved issues.
+      </p>
 
-        <nav className="flex flex-col gap-3">
-          <Link className="hover:text-[#071952]" to="/support/home">Dashboard</Link>
-          <Link className="hover:text-[#071952]" to="/support/escalated">Escalated Complaints</Link>
-          <Link className="hover:text-[#071952]" to="/support/resolved">Resolved</Link>
-        </nav>
-      </aside>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h3 className="font-semibold text-lg">Escalated</h3>
+          <p className="text-2xl font-bold text-[#37B7C3]">12</p>
+        </div>
 
-      <main className="flex-1 p-6">
-        <Outlet />
-      </main>
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h3 className="font-semibold text-lg">Resolved</h3>
+          <p className="text-2xl font-bold text-green-600">48</p>
+        </div>
 
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h3 className="font-semibold text-lg">Pending</h3>
+          <p className="text-2xl font-bold text-yellow-600">5</p>
+        </div>
+      </div>
     </div>
   );
 }
+

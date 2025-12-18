@@ -13,3 +13,12 @@ export const resolveComplaint = (id, body) => api.post(`/complaints/${id}/resolv
 export const getAllComplaints = () => api.get("/complaints");
 export const getComplaintsByCompany = (companyId) =>
   api.get(`/complaints/company/${companyId}`);
+
+export const getComplaintById = (id) =>
+  api.get(`/api/complaints/${id}`);
+
+export const getRepliesByComplaint = (id) =>
+  api.get(`/complaints/${id}/replies`);
+
+export const addReply = (data) =>
+  api.post(`/complaints/${data.complaintId}/replies`, data);

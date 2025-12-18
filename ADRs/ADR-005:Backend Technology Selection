@@ -1,0 +1,49 @@
+**Context and Problem Statement**
+
+The CMS backend must expose REST APIs, enforce business rules, handle security, and interact with the database. The framework must support service-layer architecture and role-based access control.
+
+**Decision Drivers**
+
+Support for RESTful APIs
+
+Security and Access Control
+
+Service-Oriented Design Support
+
+Developer Productivity
+
+**Considered Options**
+
+Java Spring Boot
+
+Node.js (Express)
+
+ASP.NET Core
+
+**Decision Outcome**
+
+Java Spring Boot was selected as the backend framework.
+
+**Rationale**
+
+Spring Boot provides built-in support for REST APIs, security, dependency injection, and data persistence. It supports service-layer architecture and integrates well with MySQL using Spring Data JPA.
+
+**Consequences**
+
+**Positive**
+
+Strong ecosystem and tooling
+
+Built-in security and data access support
+
+Suitable for layered and service-oriented designs
+
+**Negative**
+
+Heavier framework compared to lightweight alternatives
+
+Higher learning curve
+
+**Relationship to System Design**
+
+This decision is reflected in the Component and Code-level diagrams, showing controllers, services, and repositories.

@@ -1,0 +1,49 @@
+**Context and Problem Statement**
+
+The CMS requires a responsive and user-friendly web interface for multiple user roles. The frontend must support form handling, role-based navigation, and communication with backend REST APIs.
+
+**Decision Drivers**
+
+User Experience
+
+Component Reusability
+
+Frontend–Backend Separation
+
+Industry Adoption
+
+**Considered Options**
+
+React.js
+
+Angular
+
+Server-side rendered templates (e.g. Thymeleaf)
+
+**Decision Outcome**
+
+React.js was selected as the frontend framework.
+
+**Rationale**
+
+React supports component-based development, making the user interface modular and easy to maintain. Its strong ecosystem and compatibility with REST APIs make it suitable for building a modern frontend for a service-oriented backend.
+
+**Consequences**
+
+**Positive**
+
+Clean separation between frontend and backend
+
+Reusable UI components
+
+Strong community support
+
+**Negative**
+
+Requires additional setup for state management
+
+Increased complexity compared to server-rendered templates
+
+**Relationship to System Design**
+
+This decision is reflected in the Container diagram, where the React frontend communicates with the backend via REST APIs.

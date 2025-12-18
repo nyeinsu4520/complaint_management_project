@@ -1,22 +1,58 @@
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import Header from "../components/Header";
 
-export default function SupportLayout(){
+export default function SupportLayout() {
+  const location = useLocation();
+
+  const linkStyle = (path) =>
+    location.pathname === path
+      ? "bg-[#071952] text-white font-semibold px-4 py-2 rounded-lg shadow"
+      : "text-white hover:bg-[#5bcad4] px-4 py-2 rounded-lg transition";
+
   return (
     <div className="min-h-screen flex">
-      <aside className="w-64 bg-[#37B7C3] text-white p-5">
-        <h2 className="text-2xl font-bold mb-6">Support</h2>
-        <nav className="flex flex-col gap-3">
-          <Link to="/support/home" className="hover:text-[#071952]">Dashboard</Link>
-          <Link to="/support/escalated" className="hover:text-[#071952]">Escalated</Link>
-          <Link to="/support/resolved" className="hover:text-[#071952]">Resolved</Link>
+
+      {/* Sidebar */}
+      <aside className="w-64 bg-[#37B7C3] text-white p-6 shadow-xl flex flex-col">
+
+        {/* Title */}
+        <h2 className="text-xl font-bold mb-8">
+          Support
+        </h2>
+
+        {/* Navigation */}
+        <nav className="flex flex-col gap-2 text-md">
+          <Link
+            to="/support/home"
+            className={linkStyle("/support/home")}
+          >
+            Dashboard
+          </Link>
+
+          <Link
+            to="/support/escalated"
+            className={linkStyle("/support/escalated")}
+          >
+            Escalated Complaints
+          </Link>
+
+          <Link
+            to="/support/resolved"
+            className={linkStyle("/support/resolved")}
+          >
+            Resolved
+          </Link>
         </nav>
       </aside>
 
+      {/* Main Content */}
       <div className="flex-1 bg-[#EBF4F6]">
         <Header title="Support" />
-        <main className="p-6"><Outlet/></main>
+        <main className="p-6">
+          <Outlet />
+        </main>
       </div>
+
     </div>
   );
 }

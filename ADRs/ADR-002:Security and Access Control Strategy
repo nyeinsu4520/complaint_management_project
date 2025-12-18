@@ -1,0 +1,58 @@
+## Security and Access Control Strategy
+**Context and Problem Statement**
+
+The Complaint Management System handles sensitive data including user information, company details, and complaint records. The system must ensure that only authorised users can access system features and that complaints are correctly associated with valid companies. As this is a proof-of-concept, security mechanisms must be effective while remaining simple to implement.
+
+**Decision Drivers**
+
+Access Control: Prevent unauthorised access to system features
+
+Data Protection: Ensure complaints are linked to valid companies
+
+Implementation Simplicity: Avoid excessive complexity for a proof-of-concept
+
+Role Differentiation: Support multiple user roles with different permissions
+
+**Considered Options**
+
+Token-based authentication (e.g. JWT)
+
+External authentication / SSO
+
+Role-Based Access Control (RBAC) with application-level authentication
+
+**Decision Outcome**
+
+The system uses application-level authentication combined with Role-Based Access Control (RBAC). Users authenticate using email and password, and access to system features is restricted based on assigned roles (End User, Help Desk, Support Staff, Administrator).
+
+In addition, company-based validation is enforced to ensure that end users can only submit and manage complaints for companies they are associated with.
+
+**Rationale**
+
+RBAC provides a clear and effective way to restrict access to features without introducing the complexity of token-based authentication. Company validation adds an additional security layer by preventing users from submitting complaints for unauthorised organisations. This approach is appropriate for a proof-of-concept and can be extended in future versions.
+
+**Consequences**
+
+**Positive**
+
+Clear separation of permissions based on user roles
+
+Prevents unauthorised complaint access across companies
+
+Simple to implement and understand
+
+**Negative**
+
+No stateless authentication or token revocation
+
+Less suitable for large-scale distributed systems
+
+**Rejected Alternatives**
+
+JWT-based Authentication: More secure and scalable but not implemented due to time constraints.
+
+SSO / External Authentication: Not required for a proof-of-concept.
+
+**Relationship to System Design**
+
+This decision is reflected in the service-layer access checks and role-based routing logic in the backend services.
