@@ -1,35 +1,104 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { getNewComplaints, escalateComplaint } from "../../api/complaintApi";
-import SimpleTable from "../../components/SimpleTable";
 
-export default function NewComplaints(){
-  const [list,setList] = useState([]);
-  useEffect(()=> getNewComplaints().then(r=>setList(r.data)).catch(()=>{}),[]);
+export default function HelpDeskNew() {
+  const [complaints, setComplaints] = useState([]);
+
+  useEffect(() => {
+    getNewComplaints()
+      .then((res) => setComplaints(res.data))
+      .catch((err) => console.error("Failed to load complaints", err));
+  }, []);
 
   const handleEscalate = (id) => {
-    escalateComplaint(id, { reason: "Escalated by helpdesk" })
-      .then(()=> setList(l=>l.filter(it=>it.complaintId !== id)))
-      .catch(()=> alert("Escalation failed"));
+    escalateComplaint(id)
+      .then(() =>
+        setComplaints((prev) =>
+          prev.filter((c) => c.complaintId !== id)
+        )
+      )
+      .catch(() => alert("Escalation failed"));
   };
 
-  const cols = [
-    { key:'complaintId', title:'ID' },
-    { key:'details', title:'Details' },
-    { key:'severity', title:'Severity' },
-  ];
+  const severityStyle = (severity) => {
+    switch (severity) {
+      case "HIGH":
+        return "bg-red-100 text-red-600";
+      case "MEDIUM":
+        return "bg-yellow-100 text-yellow-700";
+      default:
+        return "bg-green-100 text-green-600";
+    }
+  };
 
   return (
-    <div>
-      <h2 className="text-xl mb-4">New Complaints</h2>
-      <SimpleTable 
-        columns={cols} 
-        data={list} 
-        actions={(row) => (
-          <div className="flex gap-2">
-            <button className="px-2 py-1 bg-[#37B7C3] text-white rounded" onClick={()=>handleEscalate(row.complaintId)}>Escalate</button>
-          </div>
+    <div className="space-y-6">
+
+      {/* Page Header */}
+      <div>
+        <h2 className="text-2xl font-bold text-[#071952]">
+          New Complaints
+        </h2>
+        <p className="text-gray-600">
+          Recently submitted complaints awaiting review
+        </p>
+      </div>
+
+      {/* Complaints List */}
+      <div className="bg-white rounded-lg shadow divide-y">
+        {complaints.length === 0 && (
+          <p className="p-6 text-gray-500 text-center">
+            No new complaints 🎉
+          </p>
         )}
-      />
+
+        {complaints.map((c) => (
+          <div
+            key={c.id}
+            className="p-4 flex items-center justify-between hover:bg-gray-50 transition"
+          >
+            <div>
+              <h3 className="font-semibold text-lg">
+                {c.details}
+              </h3>
+              <p className="text-sm text-gray-500">
+                Submitted on{" "}
+                {new Date(c.createdAt).toLocaleDateString()}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-4">
+
+              {/* Severity Badge */}
+              <span
+                className={`text-sm font-semibold px-3 py-1 rounded-full ${severityStyle(
+                  c.severity
+                )}`}
+              >
+                {c.severity}
+              </span>
+
+              {/* View */}
+               <Link
+                to={`/helpdesk/complaint/${c.id}`}
+                className="px-2 py-1 bg-[#37B7C3] text-white rounded"
+              >
+                View
+              </Link>
+
+              {/* Escalate */}
+              <button
+                onClick={() => handleEscalate(c.id)}
+                className="text-sm bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+              >
+                Escalate
+              </button>
+
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

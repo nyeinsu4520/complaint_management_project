@@ -50,24 +50,18 @@ public class ComplaintServiceImpl implements ComplaintService {
         Complaint complaint = complaintRepository.findById(complaintId)
                 .orElseThrow(() -> new RuntimeException("Complaint not found"));
 
-        complaint.setStatus(ComplaintStatus.IN_PROGRESS); // <-- FIXED
+        complaint.setStatus(ComplaintStatus.HANDLED); // <-- FIXED
         complaint.setHandledBy(handledBy);
 
         return complaintRepository.save(complaint);
     }
 
-    // @Override
-    // public Complaint resolveComplaint(Long complaintId, Long resolvedBy) {
-    //     Complaint complaint = complaintRepository.findById(complaintId)
-    //             .orElseThrow(() -> new RuntimeException("Complaint not found"));
+    @Override
+    public List<Complaint> getComplaintsAssignedTo(Long handlerId) {
+        return complaintRepository.findByHandledBy(handlerId);
+    }
 
-    //     complaint.setStatus("RESOLVED");
-    //     complaint.setResolvedBy(resolvedBy);
-
-    //     return complaintRepository.save(complaint);
-    // }
-
-      public List<ComplaintResponseDTO> getComplaintsByUser(Long userId) {
+    public List<ComplaintResponseDTO> getComplaintsByUser(Long userId) {
 
         List<Complaint> complaints = complaintRepository.findByUserId(userId);
 
@@ -86,6 +80,42 @@ public class ComplaintServiceImpl implements ComplaintService {
     return complaintRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Complaint not found"));
     }
+
+    @Override
+    public Complaint resolveByHelpdesk(Long id, Long helpdeskId) {
+        Complaint complaint = complaintRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Complaint not found"));
+
+        if (complaint.getStatus() != ComplaintStatus.HANDLED) {
+            throw new IllegalStateException("Only handled complaints can be resolved");
+        }
+
+        complaint.setStatus(ComplaintStatus.RESOLVED);
+        complaint.setResolvedBy(helpdeskId);
+
+        return complaintRepository.save(complaint);
+    }
+
+
+    @Override
+    public Complaint escalateComplaint(Long id) {
+        Complaint complaint = complaintRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Complaint not found"));
+
+        complaint.setStatus(ComplaintStatus.ESCALATED);
+
+
+        return complaintRepository.save(complaint);
+    }
+
+
+    @Override
+    public List<Complaint> getNewComplaints() {
+        return complaintRepository.findByStatusAndHandledByIsNull(
+            ComplaintStatus.PENDING
+        );
+    }
+
 
     public ComplaintResponseDTO mapToDTO(Complaint complaint) {
     ComplaintResponseDTO dto = new ComplaintResponseDTO();
@@ -112,6 +142,20 @@ public class ComplaintServiceImpl implements ComplaintService {
     }
         return dto;
     }
+
+    public Complaint closeComplaint(Long id, Long userId) {
+    Complaint complaint = complaintRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Complaint not found"));
+
+    if (complaint.getStatus() != ComplaintStatus.RESOLVED) {
+        throw new IllegalStateException("Only resolved complaints can be closed.");
+    }
+
+    // Optional: verify userId is the complaint owner
+    complaint.setStatus(ComplaintStatus.CLOSED);
+    return complaintRepository.save(complaint);
+}
+
 
 
 }

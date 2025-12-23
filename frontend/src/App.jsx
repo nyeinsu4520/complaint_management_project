@@ -7,6 +7,7 @@ import ComplaintForm from "./Pages/UserInterface/ComplaintForm";
 import ComplaintStatus from "./Pages/UserInterface/ComplaintStatus";
 import ProtectedRoute from "./components/ProtectedRoute";
 
+
 // Layouts
 import AdminLayout from "./layouts/AdminLayout";
 import HelpDeskLayout from "./layouts/HelpDeskLayout";
@@ -19,6 +20,7 @@ import AllComplaints from "./Pages/Admin/AllComplaints";
 
 import HelpDeskHome from "./Pages/HelpDesk/HelpDeskHome";
 import NewComplaints from "./Pages/HelpDesk/NewComplaints";
+import HelpDeskComplaint from "./Pages/HelpDesk/HelpDeskComplaint";
 
 import SupportHome from "./Pages/Support/SupportHome";
 import SupportEscalated from "./Pages/Support/EscalatedList";
@@ -61,7 +63,9 @@ export default function App() {
       >
         <Route path="home" element={<HelpDeskHome />} />
         <Route path="new" element={<NewComplaints />} />
+        <Route path="complaint/:id" element={<HelpDeskComplaint />} />
       </Route>
+
 
       {/* SUPPORT */}
       <Route

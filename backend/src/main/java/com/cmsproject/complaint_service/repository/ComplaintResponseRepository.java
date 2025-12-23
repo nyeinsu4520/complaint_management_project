@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ComplaintResponseRepository extends JpaRepository<ComplaintResponse, Long> {
-    List<ComplaintResponse> findAllByComplaintId(Long complaintId);
+   List<ComplaintResponse> findByComplaintId(Long complaintId);
 }

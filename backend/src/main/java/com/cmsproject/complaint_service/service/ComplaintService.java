@@ -13,9 +13,6 @@ public interface ComplaintService {
 
     Complaint assignHandler(Long id, Long handledBy);
 
-    // Complaint resolveComplaint(Long id, Long resolverUserId); 
-    // ComplaintResponse replyToComplaint(Long complaintId, Long staffUserId, String message);
-
     public List<ComplaintResponseDTO> getComplaintsByUser(Long userId);
 
     List<Complaint> getComplaintsByCompany(Long companyId);
@@ -23,5 +20,14 @@ public interface ComplaintService {
     Complaint getComplaintById(Long complaintId);
 
     public List<Complaint> getAllComplaints();
+
+    List<Complaint> getComplaintsAssignedTo(Long handlerId);
+    
+    Complaint resolveByHelpdesk(Long id, Long helpdeskId);
+
+    Complaint escalateComplaint(Long id);
+
+    List<Complaint> getNewComplaints();
    
+    Complaint closeComplaint(Long id, Long userId);
 }
