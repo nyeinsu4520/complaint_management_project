@@ -1,14 +1,20 @@
 package com.cmsproject.complaint_service.controller;
 
 import com.cmsproject.complaint_service.dto.ComplaintResponseDTO;
+import com.cmsproject.complaint_service.model.AuthorRole;
 import com.cmsproject.complaint_service.model.Complaint;
+import com.cmsproject.complaint_service.model.ComplaintStatus;
 import com.cmsproject.complaint_service.service.ComplaintService;
 import com.cmsproject.complaint_service.service.ComplaintResponseService;
 import com.cmsproject.complaint_service.dto.ReplyRequest;
+import com.cmsproject.complaint_service.dto.EscalateRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/complaints")
@@ -26,18 +32,30 @@ public class ComplaintController {
         this.responseService = responseService;
     }
 
-    
+    @PutMapping("/{id}/handle/{helpdeskId}")
+    public Complaint handleComplaint(
+            @PathVariable Long id,
+            @PathVariable Long helpdeskId
+    ) {
+        return complaintService.handleComplaint(id, helpdeskId);
+    }
+
+
+    @GetMapping("/my/{helpdeskId}")
+    public List<Complaint> getMyComplaints(@PathVariable Long helpdeskId) {
+        return complaintService.getMyComplaints(helpdeskId);
+    }
+
+
+
+
     @PostMapping("/register")
     public ResponseEntity<Complaint> registerComplaint(@RequestBody Complaint complaint) {
         Complaint savedComplaint = complaintService.createComplaint(complaint);
         return ResponseEntity.ok(savedComplaint);
     }
 
-    @PutMapping("/{id}/assign/{handlerId}")
-    public ResponseEntity<Complaint> assignHandler(@PathVariable Long id, @PathVariable Long handlerId) {
-        Complaint updated = complaintService.assignHandler(id, handlerId);
-        return ResponseEntity.ok(updated);
-    }
+    
 
     // Helpdesk resolves
    @PutMapping("/{id}/resolve/helpdesk/{helpdeskId}")
@@ -50,7 +68,7 @@ public class ComplaintController {
             responseService.addReply(
                 id,
                 helpdeskId,
-                "HELPDESK_AGENT",
+                AuthorRole.HELPDESK_AGENT,
                 request.getMessage()
             );
         }
@@ -62,13 +80,25 @@ public class ComplaintController {
     }
 
 
-    // Helpdesk escalates to support
-    @PutMapping("/{id}/escalate")
-    public ResponseEntity<Complaint> escalate(@PathVariable Long id) {
-        return ResponseEntity.ok(
-            complaintService.escalateComplaint(id)
-        );
+    @GetMapping("/support/summary")
+    public Map<String, Long> getSupportSummary() {
+        Map<String, Long> summary = new HashMap<>();
+        summary.put("ESCALATED", complaintService.countByStatus(ComplaintStatus.ESCALATED));
+        summary.put("RESOLVED", complaintService.countByStatus(ComplaintStatus.RESOLVED));
+        summary.put("PENDING", complaintService.countByStatus(ComplaintStatus.PENDING));
+        return summary;
     }
+
+
+   @PostMapping("/{id}/escalate")
+    public ResponseEntity<Complaint> escalateComplaint(
+            @PathVariable Long id,
+            @RequestBody EscalateRequest request
+    ) {
+        Complaint updated = complaintService.escalateComplaint(id, request.getReason());
+        return ResponseEntity.ok(updated);
+    }
+   
 
 
     @PutMapping("/{id}/status/{status}")
@@ -98,15 +128,15 @@ public class ComplaintController {
         return ResponseEntity.ok(complaints);
     }
 
-    @GetMapping("/assigned/{handlerId}")
-    public List<Complaint> getAssignedComplaints(@PathVariable Long handlerId) {
-        return complaintService.getComplaintsAssignedTo(handlerId);
+    
+
+    @GetMapping("/new/{companyId}")
+    public ResponseEntity<List<Complaint>> getNewComplaints(@PathVariable Long companyId) {
+        List<Complaint> complaints = complaintService.getNewComplaintsForHelpdesk(companyId);
+        return ResponseEntity.ok(complaints);
     }
 
-    @GetMapping("/new")
-    public ResponseEntity<List<Complaint>> getNewComplaints() {
-        return ResponseEntity.ok(complaintService.getNewComplaints());
-    }
+
 
     @GetMapping
     public List<Complaint> getAllComplaints() {
@@ -114,9 +144,9 @@ public class ComplaintController {
     }
 
    @PutMapping("/{id}/close/{userId}")
-public ResponseEntity<Complaint> closeComplaint(@PathVariable Long id, @PathVariable Long userId) {
-    return ResponseEntity.ok(complaintService.closeComplaint(id, userId));
-}
+    public ResponseEntity<Complaint> closeComplaint(@PathVariable Long id, @PathVariable Long userId) {
+        return ResponseEntity.ok(complaintService.closeComplaint(id, userId));
+    }
 
 
 }

@@ -6,7 +6,7 @@ import CompanyList from "./Pages/UserInterface/CompanyList";
 import ComplaintForm from "./Pages/UserInterface/ComplaintForm";
 import ComplaintStatus from "./Pages/UserInterface/ComplaintStatus";
 import ProtectedRoute from "./components/ProtectedRoute";
-
+import ReplyPage from "./Pages/UserInterface/ReplyPage";
 
 // Layouts
 import AdminLayout from "./layouts/AdminLayout";
@@ -21,9 +21,12 @@ import AllComplaints from "./Pages/Admin/AllComplaints";
 import HelpDeskHome from "./Pages/HelpDesk/HelpDeskHome";
 import NewComplaints from "./Pages/HelpDesk/NewComplaints";
 import HelpDeskComplaint from "./Pages/HelpDesk/HelpDeskComplaint";
+import AssignedToMe from "./Pages/HelpDesk/AssignedToMe";
 
 import SupportHome from "./Pages/Support/SupportHome";
-import SupportEscalated from "./Pages/Support/EscalatedList";
+import EscalatedList from "./Pages/Support/EscalatedList";
+import ResolvedList from "./Pages/Support/ResolvedList";
+import EscalateReplyPage from "./Pages/Support/EscalateReplyPage";
 
 export default function App() {
   return (
@@ -37,6 +40,7 @@ export default function App() {
       <Route path="/company-list" element={<CompanyList />} />
       <Route path="/complaintForm" element={<ComplaintForm />} />
       <Route path="/complaintStatus" element={<ComplaintStatus />} />
+       <Route path="/consumer/complaints/:id/replies" element={<ReplyPage />} />
 
       {/* ADMIN */}
       <Route
@@ -64,6 +68,7 @@ export default function App() {
         <Route path="home" element={<HelpDeskHome />} />
         <Route path="new" element={<NewComplaints />} />
         <Route path="complaint/:id" element={<HelpDeskComplaint />} />
+        <Route path="/helpdesk/assigned" element={<AssignedToMe />} />
       </Route>
 
 
@@ -77,7 +82,9 @@ export default function App() {
         }
       >
         <Route path="home" element={<SupportHome />} />
-        <Route path="escalated" element={<SupportEscalated />} />
+        <Route path="escalated" element={<EscalatedList />} />
+        <Route path="resolved" element={<ResolvedList />} />
+        <Route path="complaint/:id" element={<EscalateReplyPage />} /> 
       </Route>
 
     </Routes>

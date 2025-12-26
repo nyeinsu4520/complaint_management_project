@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { getUserComplaints } from "../../api/complaintApi";
 import Header from "../../components/Header";
 
 export default function ComplaintStatus() {
   const [complaints, setComplaints] = useState([]);
+  const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
@@ -16,7 +19,7 @@ export default function ComplaintStatus() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Header title="Complaint Status" />
+      <Header title="Complaint Management System" />
 
       <div className="p-6">
         <div className="bg-white p-6 rounded-xl shadow-md overflow-auto">
@@ -34,25 +37,23 @@ export default function ComplaintStatus() {
                 <th className="p-3">Severity</th>
                 <th className="p-3">Status</th>
                 <th className="p-3">Submitted</th>
+                <th className="p-3">Action</th>
               </tr>
             </thead>
 
             <tbody>
               {complaints.length === 0 ? (
                 <tr>
-                  <td
-                    colSpan="6"
-                    className="text-center p-4 text-[#071952]"
-                  >
+                  <td colSpan="7" className="text-center p-4 text-[#071952]">
                     No complaints found.
                   </td>
                 </tr>
               ) : (
                 complaints.map((c) => (
-                   <tr
+                  <tr
                     key={c.complaintId}
                     className="border-b hover:bg-gray-50 transition"
-                >
+                  >
                     <td className="p-3">{c.complaintId}</td>
                     <td className="p-3">{c.companyName}</td>
                     <td className="p-3">{c.details}</td>
@@ -70,6 +71,15 @@ export default function ComplaintStatus() {
 
                     <td className="p-3">
                       {new Date(c.createdAt).toLocaleDateString()}
+                    </td>
+
+                    <td className="p-3">
+                      <Link
+                        to={`/consumer/complaints/${c.complaintId}/replies`}
+                        className="bg-[#37B7C3] text-white px-3 py-1 rounded hover:bg-[#2faab6]"
+                      >
+                        View
+                      </Link>
                     </td>
                   </tr>
                 ))

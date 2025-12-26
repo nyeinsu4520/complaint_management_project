@@ -5,6 +5,7 @@ import com.cmsproject.complaint_service.model.Complaint;
 import com.cmsproject.complaint_service.model.ComplaintResponse;
 import com.cmsproject.complaint_service.service.ComplaintResponseService;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,14 +23,22 @@ public class ComplaintResponseController {
     }
 
     @PostMapping("/{id}/replies")
-    public ComplaintResponse addReply(@PathVariable Long id, @RequestBody ReplyRequest request) {
+    public ComplaintResponse addReply(
+            @PathVariable Long id,
+            @RequestBody ReplyRequest request
+    ) {
+        System.out.println("Complaint ID: " + id);
+        System.out.println("Request payload: " + request.getAuthorId() + ", " + request.getAuthorRole() + ", " + request.getMessage());
+
         return responseService.addReply(
                 id,
-                request.getStaffUserId(),
-                request.getStaffRole(),
+                request.getAuthorId(),
+                request.getAuthorRole(),
                 request.getMessage()
         );
     }
+
+
 
     @GetMapping("/{id}/replies")
     public List<ComplaintResponse> getReplies(@PathVariable Long id) {

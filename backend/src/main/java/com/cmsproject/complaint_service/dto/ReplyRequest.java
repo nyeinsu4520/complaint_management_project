@@ -1,25 +1,30 @@
 package com.cmsproject.complaint_service.dto;
 
+import com.cmsproject.complaint_service.model.AuthorRole;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 public class ReplyRequest {
 
-    private Long staffUserId;
-    private String staffRole; // HELP_DESK or SUPPORT
+    private Long authorId;
+    
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private AuthorRole authorRole;
     private String message;
 
-    public Long getStaffUserId() {
-        return staffUserId;
+    public Long getAuthorId() {
+        return authorId;
     }
 
-    public void setStaffUserId(Long staffUserId) {
-        this.staffUserId = staffUserId;
+    public void setAuthorId(Long authorId) {
+        this.authorId = authorId;
     }
 
-    public String getStaffRole() {
-        return staffRole;
+    public AuthorRole getAuthorRole() {
+        return authorRole;
     }
 
-    public void setStaffRole(String staffRole) {
-        this.staffRole = staffRole;
+    public void setAuthorRole(AuthorRole authorRole) {
+        this.authorRole = authorRole;
     }
 
     public String getMessage() {

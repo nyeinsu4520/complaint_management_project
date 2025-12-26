@@ -36,6 +36,9 @@ public class Complaint {
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(length = 500)
+    private String escalationReason;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
@@ -73,4 +76,12 @@ public class Complaint {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public String getEscalationReason() {
+    return escalationReason;
+    }
+
+    public void setEscalationReason(String escalationReason) {
+        this.escalationReason = escalationReason;
+    }
 }

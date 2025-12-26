@@ -1,22 +1,24 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getComplaintById, getRepliesByComplaint, addReply } from "../../api/complaintApi";
-import Header from "../../components/Header"; // import your header
+import { getComplaintById, getRepliesByComplaint, addReply ,closeComplaint} from "../../api/complaintApi";
+import Header from "../../components/Header";
 
-export default function ReplyPage() {
-  const { id } = useParams(); // complaint ID from URL
+export default function SupportReplyPage() {
+  const { id } = useParams();
   const [complaint, setComplaint] = useState(null);
   const [replies, setReplies] = useState([]);
   const [message, setMessage] = useState("");
-  const user = JSON.parse(localStorage.getItem("user")); // get logged-in user
+  const user = JSON.parse(localStorage.getItem("user"));
+
+    const canClose =
+    user?.role === "SUPPORT" &&
+    complaint?.status === "ESCALATED";
 
   useEffect(() => {
-    // fetch complaint details
     getComplaintById(id)
       .then((res) => setComplaint(res.data))
       .catch((err) => console.error("Error fetching complaint:", err));
 
-    // fetch replies
     getRepliesByComplaint(id)
       .then((res) => setReplies(res.data))
       .catch((err) => console.error("Error fetching replies:", err));
@@ -25,15 +27,15 @@ export default function ReplyPage() {
   const handleReply = async () => {
     if (!message.trim()) return;
 
-    if (!user?.id || !user?.role) {
-      alert("User information missing! Please log in.");
+    if (!user?.id || user.role !== "SUPPORT") {
+      alert("Support user info missing! Please log in.");
       return;
     }
 
     try {
       await addReply(id, {
         authorId: user.id,
-        authorRole: "CONSUMER",
+        authorRole: "SUPPORT",
         message: message.trim(),
       });
 
@@ -46,11 +48,22 @@ export default function ReplyPage() {
     }
   };
 
+   const handleCloseComplaint = () => {
+    if (!user?.id) {
+      alert("User info missing!");
+      return;
+    }
+
+    closeComplaint(id, user.id)
+      .then((res) => setComplaint(res.data))
+      .catch(() => alert("Failed to close complaint"));
+  };
+
   if (!complaint) return <p>Loading...</p>;
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Header title="Reply to Complaint" /> {/* Add the header here */}
+
 
       <div className="max-w-3xl mx-auto p-6 space-y-6">
         {/* Complaint Info */}
@@ -92,35 +105,45 @@ export default function ReplyPage() {
           ))}
         </div>
 
-        {/* Reply Box */}
-       {/* Reply Box */}
-<div className="bg-white p-6 rounded-lg shadow space-y-4">
-  <h3 className="text-lg font-semibold">Reply to Complaint Management Team</h3>
-  <textarea
-    className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#37B7C3]"
-    rows="4"
-    placeholder={
-      complaint.status === "CLOSED"
-        ? "This complaint is closed. You cannot reply."
-        : "Type your reply..."
-    }
-    value={message}
-    onChange={(e) => setMessage(e.target.value)}
-    disabled={complaint.status === "CLOSED"} // disable textarea if closed
-  />
-  <button
-    onClick={handleReply}
-    disabled={complaint.status === "CLOSED"} // disable button if closed
-    className={`px-5 py-2 rounded-lg text-white ${
-      complaint.status === "CLOSED"
-        ? "bg-gray-400 cursor-not-allowed"
-        : "bg-[#37B7C3] hover:bg-[#2faab6]"
-    }`}
-  >
-    Send Reply
-  </button>
-</div>
-
+        {/* Reply Box for Support */}
+        <div className="bg-white p-6 rounded-lg shadow space-y-4">
+          <h3 className="text-lg font-semibold">Reply to Consumer / Helpdesk</h3>
+          <textarea
+            className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#37B7C3]"
+            rows="4"
+            placeholder={
+              complaint.status === "CLOSED"
+                ? "This complaint is closed. You cannot reply."
+                : "Type your reply..."
+            }
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            disabled={complaint.status === "CLOSED"}
+          />
+          <div className="flex flex-wrap gap-4 mt-2">
+            <button
+            onClick={handleReply}
+            disabled={complaint.status === "CLOSED"}
+            className={`px-5 py-2 rounded-lg text-white ${
+                complaint.status === "CLOSED"
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-[#37B7C3] hover:bg-[#2faab6]"
+            }`}
+            >
+            Send Reply
+            </button>
+            
+            <button
+            disabled={!canClose}
+            onClick={handleCloseComplaint}
+            className={`px-5 py-2 rounded-lg text-white ${
+                canClose ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-400 cursor-not-allowed"
+            }`}
+            >
+            Close Complaint
+            </button>
+        </div>
+        </div>
       </div>
     </div>
   );

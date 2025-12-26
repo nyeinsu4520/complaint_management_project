@@ -37,10 +37,10 @@ export default function SupportLayout() {
           </Link>
 
           <Link
-            to="/support/resolved"
-            className={linkStyle("/support/resolved")}
+            to="/support/closed"
+            className={linkStyle("/support/closed")}
           >
-            Resolved
+            Closed
           </Link>
         </nav>
       </aside>

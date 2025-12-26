@@ -8,6 +8,9 @@ import com.cmsproject.complaint_service.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 import java.util.List;
 
 @Service
@@ -56,11 +59,6 @@ public class ComplaintServiceImpl implements ComplaintService {
         return complaintRepository.save(complaint);
     }
 
-    @Override
-    public List<Complaint> getComplaintsAssignedTo(Long handlerId) {
-        return complaintRepository.findByHandledBy(handlerId);
-    }
-
     public List<ComplaintResponseDTO> getComplaintsByUser(Long userId) {
 
         List<Complaint> complaints = complaintRepository.findByUserId(userId);
@@ -97,24 +95,14 @@ public class ComplaintServiceImpl implements ComplaintService {
     }
 
 
-    @Override
-    public Complaint escalateComplaint(Long id) {
-        Complaint complaint = complaintRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Complaint not found"));
-
-        complaint.setStatus(ComplaintStatus.ESCALATED);
+  
 
 
-        return complaintRepository.save(complaint);
+   @Override
+    public List<Complaint> getNewComplaintsForHelpdesk(Long companyId) {
+        return complaintRepository.findPendingByCompanyId(companyId, ComplaintStatus.PENDING);
     }
 
-
-    @Override
-    public List<Complaint> getNewComplaints() {
-        return complaintRepository.findByStatusAndHandledByIsNull(
-            ComplaintStatus.PENDING
-        );
-    }
 
 
     public ComplaintResponseDTO mapToDTO(Complaint complaint) {
@@ -147,14 +135,90 @@ public class ComplaintServiceImpl implements ComplaintService {
     Complaint complaint = complaintRepository.findById(id)
         .orElseThrow(() -> new RuntimeException("Complaint not found"));
 
-    if (complaint.getStatus() != ComplaintStatus.RESOLVED) {
-        throw new IllegalStateException("Only resolved complaints can be closed.");
+   if (
+        complaint.getStatus() != ComplaintStatus.ESCALATED &&
+        complaint.getStatus() != ComplaintStatus.RESOLVED
+    ) {
+        throw new IllegalStateException(
+            "Only escalated or resolved complaints can be closed."
+        );
     }
+
 
     // Optional: verify userId is the complaint owner
     complaint.setStatus(ComplaintStatus.CLOSED);
     return complaintRepository.save(complaint);
 }
+
+@Override
+public Complaint handleComplaint(Long id, Long helpdeskId) {
+    Complaint c = complaintRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Complaint not found"));
+
+    // Fetch companyId from complaint
+    Long companyId = c.getCompanyId();
+
+    if (c.getStatus() != ComplaintStatus.PENDING) {
+        throw new IllegalStateException("Complaint already handled");
+    }
+
+    c.setHandledBy(helpdeskId);
+    c.setStatus(ComplaintStatus.HANDLED);
+
+    return complaintRepository.save(c);
+}
+
+@Override
+public List<Complaint> getMyComplaints(Long helpdeskId) {
+    // Get all companies this helpdesk handles complaints for
+    List<Long> companyIds = complaintRepository.findCompanyIdsByHandledBy(helpdeskId);
+    System.out.println("DEBUG: companyIds = " + companyIds + ", helpdeskId = " + helpdeskId);
+
+    if (companyIds == null || companyIds.isEmpty()) {
+        // Return empty list if no companies found
+        return Collections.emptyList();
+    }
+
+    List<Complaint> complaints = new ArrayList<>();
+
+   
+    for (Long companyId : companyIds) { 
+    try {
+        complaints.addAll(
+            complaintRepository.findByCompanyIdAndHandledByAndStatusNot(
+                companyId,
+                helpdeskId,
+                ComplaintStatus.PENDING 
+            )
+        );
+    } catch (Exception e) {
+        e.printStackTrace(); 
+    }
+}
+
+
+    return complaints;
+}
+
+
+
+public Complaint escalateComplaint(Long complaintId, String reason) {
+    Complaint complaint = complaintRepository.findById(complaintId)
+        .orElseThrow(() -> new RuntimeException("Complaint not found"));
+
+    complaint.setStatus(ComplaintStatus.ESCALATED);
+    complaint.setEscalationReason(reason);
+
+    return complaintRepository.save(complaint);
+}
+
+public long countByStatus(ComplaintStatus status) {
+        return complaintRepository.countByStatus(status);
+    }
+
+
+
+
 
 
 

@@ -1,6 +1,19 @@
-import { Link, Outlet } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { getSupportSummary } from "../../api/complaintApi";
 
 export default function SupportHome() {
+  const [summary, setSummary] = useState({
+    ESCALATED: 0,
+    RESOLVED: 0,
+    PENDING: 0,
+  });
+
+  useEffect(() => {
+    getSupportSummary()
+      .then((res) => setSummary(res.data))
+      .catch((err) => console.error("Failed to load summary", err));
+  }, []);
+
   return (
     <div>
       <h1 className="text-2xl font-bold text-[#071952] mb-4">
@@ -13,22 +26,30 @@ export default function SupportHome() {
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Escalated */}
         <div className="bg-white p-4 rounded-lg shadow">
           <h3 className="font-semibold text-lg">Escalated</h3>
-          <p className="text-2xl font-bold text-[#37B7C3]">12</p>
+          <p className="text-2xl font-bold text-red-600">
+            {summary.ESCALATED}
+          </p>
         </div>
 
+        {/* Resolved */}
         <div className="bg-white p-4 rounded-lg shadow">
           <h3 className="font-semibold text-lg">Resolved</h3>
-          <p className="text-2xl font-bold text-green-600">48</p>
+          <p className="text-2xl font-bold text-green-600">
+            {summary.RESOLVED}
+          </p>
         </div>
 
+        {/* Pending */}
         <div className="bg-white p-4 rounded-lg shadow">
           <h3 className="font-semibold text-lg">Pending</h3>
-          <p className="text-2xl font-bold text-yellow-600">5</p>
+          <p className="text-2xl font-bold text-yellow-600">
+            {summary.PENDING}
+          </p>
         </div>
       </div>
     </div>
   );
 }
-

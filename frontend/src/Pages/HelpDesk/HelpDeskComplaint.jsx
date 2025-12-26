@@ -4,6 +4,7 @@ import {
   getComplaintById,
   getRepliesByComplaint,
   addReply,
+  handleComplaint,
   resolveComplaint,
   escalateComplaint,
   closeComplaint, 
@@ -27,10 +28,8 @@ export default function HelpDeskComplaint() {
       .catch((err) => console.error(err));
   }, [id]);
 
-  // Determine permissions based on status
-  const canReply = complaint?.status === "HANDLED";
-  const canResolve = complaint?.status === "HANDLED";
-  const canClose = complaint?.status === "RESOLVED";
+
+
 
   const formatDate = (dt) => new Date(dt).toLocaleString();
 
@@ -43,8 +42,8 @@ export default function HelpDeskComplaint() {
     }
 
     const data = {
-      staffUserId: user.id,
-      staffRole: user.role,
+      authorId: user.id,       
+      authorRole: user.role,    
       message: replyMessage,
     };
 
@@ -55,6 +54,10 @@ export default function HelpDeskComplaint() {
       })
       .catch(() => alert("Failed to send reply"));
   };
+
+
+  
+
 
   // Handle resolve
   const handleResolve = () => {
@@ -71,7 +74,10 @@ export default function HelpDeskComplaint() {
   // Handle escalate
   const handleEscalate = () => {
     escalateComplaint(id, { reason: "Escalated by helpdesk" })
-      .then((res) => setComplaint(res.data))
+      .then((res) => {
+        setComplaint(res.data); // update state so status becomes ESCALATED
+        alert("Complaint escalated to Support!");
+      })
       .catch(() => alert("Failed to escalate"));
   };
 
@@ -88,6 +94,14 @@ export default function HelpDeskComplaint() {
   };
 
   if (!complaint) return <p>Loading complaint...</p>;
+  const status = complaint.status.toUpperCase();
+
+  const canReply = status === "HANDLED";
+  const canHandle = status === "PENDING"; 
+  const canResolve = status === "HANDLED";
+  const canClose = status === "RESOLVED";
+  const canEscalate = status === "PENDING" || status === "HANDLED";
+  const isClosed = status === "CLOSED";
 
   return (
     <div className="space-y-6">
@@ -111,23 +125,27 @@ export default function HelpDeskComplaint() {
         </div>
       </div>
 
-      {/* Conversation */}
-      <div className="bg-white p-5 rounded-lg shadow space-y-4">
-        <h3 className="font-semibold text-lg">Conversation</h3>
-        {replies.map((r) => (
-          <div
-            key={r.id}
-            className={`p-4 rounded-lg max-w-[80%] ${
-              r.authorRole === "HELPDESK" ? "bg-blue-50 ml-auto" : "bg-gray-100"
-            }`}
-          >
-            <p className="text-gray-800">{r.message}</p>
-            <span className="text-xs text-gray-500 block mt-1">
-              {r.authorRole} • {formatDate(r.createdAt)}
-            </span>
-          </div>
+
+      {/* Replies */}
+      <div className="bg-white p-6 rounded-lg shadow space-y-4">
+        <h3 className="text-lg font-semibold">Messages</h3>
+        {replies
+          .filter(r => ["CONSUMER", "HELPDESK_AGENT", "SUPPORT"].includes(r.authorRole))
+          .map(r => (
+            <div
+              key={r.id}
+              className={`p-4 rounded-lg max-w-[80%] ${
+                r.authorRole === "HELPDESK_AGENT" ? "bg-gray-100 ml-auto" : "bg-blue-50"
+              }`}
+            >
+              <p className="text-gray-800">{r.message}</p>
+              <span className="text-xs text-gray-500 block mt-1">
+                {r.authorRole} • {new Date(r.createdAt).toLocaleString()}
+              </span>
+            </div>
         ))}
       </div>
+
 
       {/* Reply Box */}
       <div className="bg-white p-5 rounded-lg shadow space-y-4">
@@ -147,6 +165,23 @@ export default function HelpDeskComplaint() {
           value={replyMessage}
           onChange={(e) => setReplyMessage(e.target.value)}
         />
+
+        
+        <button
+          disabled={!canHandle}
+          onClick={() =>
+            handleComplaint(id, user.id)
+              .then((res) => setComplaint(res.data)) // update complaint state
+              .catch(() => alert("Failed to handle complaint"))
+          }
+          className={`px-4 py-2 rounded text-white ${
+            canHandle ? "bg-blue-600" : "bg-gray-400"
+          }`}
+        >
+          Handle
+        </button>
+
+
 
         <div className="flex gap-3">
           <button
@@ -170,8 +205,13 @@ export default function HelpDeskComplaint() {
           </button>
 
           <button
-            className="bg-red-500 text-white px-5 py-2 rounded-lg hover:bg-red-600"
+            disabled={!canEscalate}
             onClick={handleEscalate}
+            className={`px-5 py-2 rounded-lg text-white ${
+              canEscalate
+                ? "bg-red-500 hover:bg-red-600"
+                : "bg-gray-400 cursor-not-allowed"
+            }`}
           >
             Escalate
           </button>

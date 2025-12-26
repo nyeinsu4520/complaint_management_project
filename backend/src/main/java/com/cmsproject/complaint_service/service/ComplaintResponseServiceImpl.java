@@ -1,5 +1,6 @@
 package com.cmsproject.complaint_service.service;
 
+import com.cmsproject.complaint_service.model.AuthorRole;
 import com.cmsproject.complaint_service.model.Complaint;
 import com.cmsproject.complaint_service.model.ComplaintResponse;
 import com.cmsproject.complaint_service.model.ComplaintStatus;
@@ -26,25 +27,29 @@ public class ComplaintResponseServiceImpl implements ComplaintResponseService {
     }
 
     @Override
-    public ComplaintResponse addReply(Long complaintId, Long staffUserId, String staffRole, String message) {
+    public ComplaintResponse addReply(Long complaintId, Long authorId, AuthorRole authorRole, String message) {
         Complaint complaint = complaintRepository.findById(complaintId)
                 .orElseThrow(() -> new RuntimeException("Complaint not found"));
 
-
-         if (complaint.getStatus() != ComplaintStatus.HANDLED) {
-        throw new IllegalStateException(
-            "Replies are only allowed when the complaint is being handled"
-        );
-    }
+        // Only restrict non-consumer replies
+        if (authorRole != AuthorRole.CONSUMER &&
+    complaint.getStatus() != ComplaintStatus.HANDLED &&
+    complaint.getStatus() != ComplaintStatus.ESCALATED) {
+            throw new IllegalStateException(
+                "Replies are only allowed when the complaint is being handled"
+            );
+        }
 
         ComplaintResponse response = new ComplaintResponse();
         response.setComplaint(complaint);
-        response.setStaffUserId(staffUserId);
-        response.setStaffRole(staffRole);
+        response.setAuthorId(authorId);
+        response.setAuthorRole(authorRole);
         response.setMessage(message);
 
         return complaintResponseRepository.save(response);
     }
+
+
 
     @Override
     public List<ComplaintResponse> getRepliesByComplaint(Long complaintId) {
