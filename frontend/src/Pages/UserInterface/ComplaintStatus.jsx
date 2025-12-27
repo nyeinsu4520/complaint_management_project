@@ -19,7 +19,7 @@ export default function ComplaintStatus() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Header title="Complaint Management System" />
+      <Header title="User Dashboard" />
 
       <div className="p-6">
         <div className="bg-white p-6 rounded-xl shadow-md overflow-auto">

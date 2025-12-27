@@ -5,3 +5,5 @@ export const getCompanies = () =>
 
 export const getCompanyUsers = (companyId) => 
     api.get(`/companies/${companyId}/users`);
+
+export const addCompany = (companyData) => api.post("/companies", companyData);

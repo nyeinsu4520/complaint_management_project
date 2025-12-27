@@ -43,4 +43,7 @@ export const resolveComplaint = (complaintId, helpdeskId, message) =>
   export const closeComplaint = (complaintId, userId) =>
   api.put(`/complaints/${complaintId}/close/${userId}`);
 
+export const submitFeedback = (complaintId, feedbackData) => {
+  return api.post(`/feedback/${complaintId}/feedback`, feedbackData);
+};
 

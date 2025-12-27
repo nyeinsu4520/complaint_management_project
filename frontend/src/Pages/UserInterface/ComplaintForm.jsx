@@ -42,7 +42,7 @@ export default function ComplaintForm() {
     <div className="flex flex-col h-screen bg-gray-100">
 
       {/* HEADER */}
-      <Header title="Complaint Management System " />
+      <Header title="User Dashboard" />
 
       {/* CONTENT */}
       <main className="flex justify-center items-start p-8">

@@ -7,6 +7,7 @@ import ComplaintForm from "./Pages/UserInterface/ComplaintForm";
 import ComplaintStatus from "./Pages/UserInterface/ComplaintStatus";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ReplyPage from "./Pages/UserInterface/ReplyPage";
+import UserHomePage from "./Pages/UserInterface/UserHomePage";
 
 // Layouts
 import AdminLayout from "./layouts/AdminLayout";
@@ -17,6 +18,7 @@ import SupportLayout from "./layouts/SupportLayout";
 import AdminDashboard from "./Pages/Admin/AdminDashboard";
 import ManageUsers from "./Pages/Admin/ManageUsers";
 import AllComplaints from "./Pages/Admin/AllComplaints";
+import AddCompany from "./Pages/Admin/AddCompanyPage";
 
 import HelpDeskHome from "./Pages/HelpDesk/HelpDeskHome";
 import NewComplaints from "./Pages/HelpDesk/NewComplaints";
@@ -37,6 +39,7 @@ export default function App() {
       <Route path="/register" element={<Register />} />
 
       {/* Normal User */}
+      <Route path="/home" element={<UserHomePage />} />
       <Route path="/company-list" element={<CompanyList />} />
       <Route path="/complaintForm" element={<ComplaintForm />} />
       <Route path="/complaintStatus" element={<ComplaintStatus />} />
@@ -54,6 +57,7 @@ export default function App() {
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="users" element={<ManageUsers />} />
         <Route path="complaints" element={<AllComplaints />} />
+          <Route path="addcompany" element={<AddCompany />} />
       </Route>
 
       {/* HELPDESK */}

@@ -36,6 +36,13 @@ export default function AdminLayout() {
           >
             All Complaints
           </Link>
+
+          <Link
+            to="/admin/addcompany"
+            className={linkStyle("/admin/addcompany")}
+          >
+            Add Company
+          </Link>
         </nav>
       </aside>
 

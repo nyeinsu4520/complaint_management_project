@@ -24,7 +24,7 @@ export default function CompanyList() {
   return (
     <div className="flex flex-col h-screen bg-gray-100">
 
-      <Header title="Complaint Management System" />
+      <Header title="User Dashboard" />
 
       <main className="p-6 flex justify-center overflow-auto">
         <div className="bg-[#EBF4F6] p-6 rounded-2xl shadow-md max-w-xl w-full">
